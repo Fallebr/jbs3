@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter/src/rendering/box.dart';
-import 'input.dart';
+
 import 'result.dart';
 import 'convert.dart';
+import 'RiwayatKonversi.dart';
+import 'input.dart';
 
 void main() {
   runApp(MyApp());
@@ -15,42 +15,93 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  TextEditingController etCelcius = new TextEditingController();
-  double nCelcius = 0;
-  double nReamur = 0;
-  double nKelvin = 0;
-  void konversiSuhu() {
+  //controller
+  final TextEditingController etInput = new TextEditingController();
+
+  //variabel berubah
+  double _inputUser = 0;
+  double _kelvin = 0;
+  double _reamur = 0;
+
+  //mengeset nilai pada dropdown
+  String _newValue = "Kelvin";
+  double _result = 0;
+
+  //Fungsi perhitungan suhu perlu untuk diubah sehingga hanya memproses konversi sesuai
+  //dengan pilihan pengguna.
+  void _konversiSuhu() {
     setState(() {
-      nCelcius = double.parse(etCelcius.text);
-      nKelvin = nCelcius + 273;
-      nReamur = (4 / 5) * nCelcius;
+      _inputUser = double.parse(etInput.text);
+      if (_newValue == "Kelvin")
+        _result = _inputUser + 273;
+      else
+        _result = (4 / 5) * _inputUser;
+      //untuk menampilkan hasil riwayat
+      listViewItem.add("$_newValue : $_result");
     });
   }
+
+  //buat list
+  var listItem = {"Kelvin", "Reamur"};
+
+  //variable bertipe List<String> (praktikum 2)
+  // ignore: deprecated_member_use
+  List<String> listViewItem = List<String>();
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Konverter Suhu',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        visualDensity: VisualDensity.adaptivePlatformDensity,
-      ),
-      home: Scaffold(
-        appBar: AppBar(
-          title: Text("Konverter Suhu"),
+        debugShowCheckedModeBanner: false,
+        title: 'Flutter Demo',
+        theme: ThemeData(
+          primarySwatch: Colors.blue,
+          visualDensity: VisualDensity.adaptivePlatformDensity,
         ),
-        body: Container(
-          margin: EdgeInsets.all(8),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              Input(etCelcius: etCelcius),
-              Result(kelvin: nKelvin, reamur: nReamur),
-              Convert(KonvertHandler: konversiSuhu),
-            ],
+        home: Scaffold(
+          appBar: AppBar(
+            title: Text("Konverter Suhu"),
           ),
-        ),
-      ),
+          body: Container(
+            margin: EdgeInsets.all(8),
+            child: Column(
+              children: [
+                Input(etInput: etInput),
+                //memperluas anak row
+                buildDropdownButton(),
+                Result(
+                  result: _result,
+                ),
+                //Convert(konvertHandler: _konversiSuhu),
+                //Riwayat Konversi
+                Container(
+                  margin: EdgeInsets.only(top: 10.0, bottom: 10.0),
+                  child: Text(
+                    "Riwayat Konversi",
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                  ),
+                ),
+                Expanded(child: RiwayatKonversi(listViewItem: listViewItem)),
+              ],
+            ),
+          ),
+        ));
+  }
+
+  DropdownButton<String> buildDropdownButton() {
+    return DropdownButton<String>(
+      items: listItem.map((String value) {
+        return DropdownMenuItem<String>(
+          value: value,
+          child: Text(value),
+        );
+      }).toList(),
+      // isi value dengan variabel _newValue.
+      value: _newValue,
+      onChanged: (String changeValue) {
+        setState(() {
+          _newValue = changeValue;
+        });
+      },
     );
   }
 }

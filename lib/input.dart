@@ -4,21 +4,18 @@ import 'package:flutter/services.dart';
 class Input extends StatelessWidget {
   const Input({
     Key key,
-    @required this.etCelcius,
+    @required this.etInput,
   }) : super(key: key);
 
-  final TextEditingController etCelcius;
+  final TextEditingController etInput;
 
   @override
   Widget build(BuildContext context) {
     return TextFormField(
-      controller: etCelcius,
-      decoration:
-          const InputDecoration(hintText: "Masukkan Suhu dalam Celcius"),
+      decoration: InputDecoration(hintText: "Masukkan Suhu Dalam Celcius"),
+      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+      controller: etInput,
       keyboardType: TextInputType.number,
-      inputFormatters: <TextInputFormatter>[
-        FilteringTextInputFormatter.digitsOnly
-      ],
     );
   }
 }
